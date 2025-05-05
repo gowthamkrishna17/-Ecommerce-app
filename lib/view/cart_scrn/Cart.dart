@@ -1,13 +1,32 @@
 import 'package:ecommerce_app/constant_widget/comstands.dart';
 
 import 'package:ecommerce_app/model/favorite_model/favoriteModel.dart';
+import 'package:ecommerce_app/view/widgets/checkout_widget.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class cart_screen extends StatelessWidget {
+List<Map<String, dynamic>> cartList = [];
+double totalprice = 0.0;
+
+double calculateTotalPrice() {
+  double total = 0.0;
+  for (var item in cartList) {
+    double rate = item['price'];
+    int quantity = item['quantity'] ?? 1; // Default to 1 if no quantity is set
+    total += rate * quantity;
+  }
+  return total;
+}
+
+class cart_screen extends StatefulWidget {
   const cart_screen({super.key});
 
+  @override
+  State<cart_screen> createState() => _cart_screenState();
+}
+
+class _cart_screenState extends State<cart_screen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<Favoritemodel>(context, listen: false);
@@ -29,18 +48,17 @@ class cart_screen extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: ListView.separated(
-                      // scrollDirection: Axis.vertical,
-                      separatorBuilder: (BuildContext context, int index) =>
-                          Kheight15,
+                    child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: 1,
+                      itemCount: cartList.length,
                       itemBuilder: (context, index) {
+                        var item = cartList[index];
                         return Container(
+                          margin: EdgeInsets.symmetric(vertical: 5),
                           padding:
                               EdgeInsets.symmetric(horizontal: 7, vertical: 7),
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: const Color.fromARGB(255, 255, 255, 255),
                               borderRadius: radius10,
                               boxShadow: [kshodow]),
                           child: Column(
@@ -52,48 +70,45 @@ class cart_screen extends StatelessWidget {
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Container(
+                                      child: SizedBox(
                                         height: 80,
                                         width: 80,
-                                        child: Image.asset(
-                                          'assets/images/onacopa21.jpg',
+                                        child: Image.network(
+                                          item["image"],
                                           fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
                                     Container(
                                       padding: EdgeInsets.only(left: 5),
-                                      height: 80,
+                                      height: 100,
                                       width: 120,
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Onam Gift box',
+                                            item["title"],
+                                            maxLines: 3,
                                             style: TextStyle(
+                                                overflow: TextOverflow.ellipsis,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w800),
                                           ),
                                           Kheight5,
-                                          Text(
-                                            "medium",
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                            ),
-                                          ),
                                           Spacer(),
                                           Text(
-                                            ("RS.${provider.prize.toInt()}"),
+                                            ('\$${item['price'].toString()}'),
                                             style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w800),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w800,
+                                                color: Colors.green),
                                           ),
                                         ],
                                       ),
                                     ),
                                     Spacer(),
-                                    rounded_btn(
+                                    Rounded_btn(
                                       btnAction: provider.decrement,
                                       iconadd: Icons.remove,
                                     ),
@@ -106,7 +121,7 @@ class cart_screen extends StatelessWidget {
                                       );
                                     }),
                                     Kwidth10,
-                                    rounded_btn(
+                                    Rounded_btn(
                                       btnAction: provider.increment,
                                       iconadd: Icons.add,
                                     ),
@@ -133,12 +148,19 @@ class cart_screen extends StatelessWidget {
                                           color: Colors.black,
                                           size: 22,
                                         ),
-                                        Text(
-                                          "Remove",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black,
-                                            fontSize: 13,
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              cartList.removeAt(index);
+                                            });
+                                          },
+                                          child: Text(
+                                            "Remove",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black,
+                                              fontSize: 13,
+                                            ),
                                           ),
                                         )
                                       ],
@@ -190,60 +212,11 @@ class cart_screen extends StatelessWidget {
   }
 }
 
-class checkout_sec extends StatelessWidget {
-  const checkout_sec({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      width: double.infinity,
-      height: 120,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [kshodow],
-          border: Border(top: BorderSide(color: colorgrey))),
-      child: Column(
-        children: [
-          Kheight15,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Total",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-              ),
-              Consumer<Favoritemodel>(builder: (context, provider, child) {
-                return Text(
-                  "\$ ${provider.total}.00",
-                  style: CatStyle,
-                );
-              })
-            ],
-          ),
-          Kheight10,
-          MaterialButton(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            color: Colors.amber,
-            height: 50,
-            minWidth: 300,
-            onPressed: () {},
-            child: Text('CheckOut'),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class rounded_btn extends StatelessWidget {
+class Rounded_btn extends StatelessWidget {
   final IconData iconadd;
   final VoidCallback btnAction;
 
-  const rounded_btn(
+  const Rounded_btn(
       {super.key, required this.iconadd, required this.btnAction});
 
   @override

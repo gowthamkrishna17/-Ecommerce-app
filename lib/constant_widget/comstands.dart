@@ -49,3 +49,12 @@ const greyColor = Color.fromARGB(255, 199, 199, 199);
 const fwlogin = FontWeight.w600;
 
 const kBolditemStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w800);
+
+InputDecoration costomeinputDec(String label) {
+  return InputDecoration(
+    label: Text(label),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  );
+}

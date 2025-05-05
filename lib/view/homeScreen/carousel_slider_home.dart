@@ -23,7 +23,7 @@ class CarouselSliderHome extends StatelessWidget {
             'assets/images/Sadhya.jpg',
             fit: BoxFit.cover,
           ),
-        ], options: CarouselOptions(autoPlay: false, viewportFraction: 1.0)),
+        ], options: CarouselOptions(autoPlay: true, viewportFraction: 1.0)),
       ),
     );
   }

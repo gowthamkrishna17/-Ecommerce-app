@@ -1,4 +1,5 @@
 import 'package:ecommerce_app/constant_widget/comstands.dart';
+import 'package:ecommerce_app/view/login_screen/signin_screen.dart';
 import 'package:ecommerce_app/view/mainScreen/MainScreen.dart';
 
 import 'package:flutter/material.dart';
@@ -159,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                   )),
               Kheight20,
               SizedBox(
-                height: 100,
+                height: 80,
               ),
               SizedBox(
                   child: Row(
@@ -167,12 +168,18 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Text("Don't have an account?"),
                   Kwidth10,
-                  Text("Sign Up",
-                      style: TextStyle(
-                        color: const Color.fromARGB(255, 80, 26, 1),
-                      ))
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => SigninScreen()));
+                    },
+                    child: Text("Sign Up",
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 80, 26, 1),
+                        )),
+                  )
                 ],
-              ))
+              )),
             ],
           ),
         ),

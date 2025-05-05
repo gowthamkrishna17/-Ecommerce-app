@@ -1,16 +1,37 @@
+import 'package:ecommerce_app/apiServices/product_provider.dart';
 import 'package:ecommerce_app/constant_widget/comstands.dart';
+
+import 'package:ecommerce_app/view/detial_screen/product_Detial_Page.dart';
+
 import 'package:ecommerce_app/view/favorite/favorite.dart';
 import 'package:ecommerce_app/view/homeScreen/carousel_slider_home.dart';
 import 'package:ecommerce_app/view/homeScreen/home_icon.dart';
+import 'package:ecommerce_app/view/homeScreen/notification_screen.dart/notification_screen.dart';
 import 'package:ecommerce_app/view/homeScreen/widget/home_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProductProvider>(context, listen: false).LoadProducts();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ProductProvider>(context);
     return ListView(
       padding: EdgeInsets.all(12),
       children: [
@@ -20,7 +41,7 @@ class HomeScreen extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    "Hi, Shammas",
+                    "Hi",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 30,
@@ -48,6 +69,10 @@ class HomeScreen extends StatelessWidget {
                       ),
                       child: GestureDetector(
                         child: Icon(Icons.notifications_outlined),
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => NotificationScreen()));
+                        },
                       )),
                   Positioned(
                       left: 10,
@@ -80,7 +105,6 @@ class HomeScreen extends StatelessWidget {
             children: [
               Category_text(
                 title: "Categories",
-                btnTitle: "See All",
                 btnAction: () {},
               ),
               Kheight10,
@@ -117,15 +141,65 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               Kheight20,
-              Category_text(
-                  btnAction: () {}, btnTitle: "View All", title: "Top Selling"),
+              Category_text(btnAction: () {}, title: "Top Selling"),
               Kheight10,
-              home_row(),
+              provider.isLoading
+                  ? CircularProgressIndicator()
+                  : SizedBox(
+                      height: 300,
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          // shrinkWrap: true,
+                          // physics: NeverScrollableScrollPhysics(),
+                          itemCount: provider.bestSelling.length,
+                          itemBuilder: (context, index) {
+                            final product = provider.bestSelling[index];
+                            return HomeRow(
+                              ontap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ProductDetialPage(
+                                          title: product.name,
+                                          imageUrl: product.imageUrl,
+                                          description: product.discription,
+                                          price: product.price,
+                                        )));
+                              },
+                              name: product.name,
+                              imageUrl: product.imageUrl,
+                              price: product.price,
+                            );
+                          }),
+                    ),
               Kheight20,
-              Category_text(
-                  btnAction: () {}, btnTitle: "View All", title: "Best offers"),
+              Category_text(btnAction: () {}, title: "Best offers"),
               Kheight10,
-              home_row(),
+              provider.isLoading
+                  ? CircularProgressIndicator()
+                  : SizedBox(
+                      height: 300,
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          // shrinkWrap: true,
+                          // physics: NeverScrollableScrollPhysics(),
+                          itemCount: provider.bestOffers.length,
+                          itemBuilder: (context, index) {
+                            final product = provider.bestOffers[index];
+                            return HomeRow(
+                              ontap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ProductDetialPage(
+                                          title: product.name,
+                                          imageUrl: product.imageUrl,
+                                          description: product.discription,
+                                          price: product.price,
+                                        )));
+                              },
+                              name: product.name,
+                              imageUrl: product.imageUrl,
+                              price: product.price,
+                            );
+                          }),
+                    ),
             ],
           ),
         )
@@ -137,12 +211,12 @@ class HomeScreen extends StatelessWidget {
 class Category_text extends StatelessWidget {
   final String title;
   final VoidCallback btnAction;
-  final String btnTitle;
-  const Category_text(
-      {super.key,
-      required this.btnAction,
-      required this.title,
-      required this.btnTitle});
+
+  const Category_text({
+    super.key,
+    required this.btnAction,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -153,12 +227,6 @@ class Category_text extends StatelessWidget {
           style: titleText18,
         ),
         Spacer(),
-        TextButton(
-            onPressed: btnAction,
-            child: Text(
-              btnTitle,
-              style: TextStyle(color: Colors.black87, fontSize: 15),
-            ))
       ],
     );
   }

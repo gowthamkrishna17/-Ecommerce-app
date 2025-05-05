@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/apiServices/product_provider.dart';
 import 'package:ecommerce_app/model/favorite_model/favoriteModel.dart';
 
 import 'package:ecommerce_app/view/login_screen/login_page.dart';
@@ -12,8 +13,9 @@ void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-        create: (_) => Favoritemodel(),
+        create: (_) => ProductProvider(),
       ),
+      ChangeNotifierProvider(create: (_) => Favoritemodel()),
     ],
     child: const MyApp(),
   ));

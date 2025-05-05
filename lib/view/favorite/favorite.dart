@@ -4,110 +4,127 @@ import 'package:ecommerce_app/model/favorite_model/favoriteModel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Favorite_screen extends StatelessWidget {
+List<Map<String, dynamic>> favList = [];
+
+class Favorite_screen extends StatefulWidget {
   const Favorite_screen({super.key});
 
   @override
+  State<Favorite_screen> createState() => _Favorite_screenState();
+}
+
+class _Favorite_screenState extends State<Favorite_screen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            height: 730,
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
+      body: Container(
+        height: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          children: [
+            Kheight30,
+            Kheight5,
+            Row(
               children: [
-                Kheight30,
-                Kheight5,
-                Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(Icons.arrow_back_ios)),
-                    SizedBox(
-                      width: 90,
-                    ),
-                    Text(
-                      "Favorite",
-                      style: CatStyle,
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: ListView.separated(
-                    // scrollDirection: Axis.vertical,
-                    separatorBuilder: (BuildContext context, int index) =>
-                        Kheight15,
-                    shrinkWrap: true,
-                    itemCount: 2,
-                    itemBuilder: (context, index) {
-                      return cart_box();
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
                     },
-                  ),
+                    icon: Icon(Icons.arrow_back_ios)),
+                SizedBox(
+                  width: 90,
+                ),
+                Text(
+                  "Favorite",
+                  style: CatStyle,
                 ),
               ],
             ),
-          ),
-          Spacer(),
-          checkout_sec()
-        ],
+            Expanded(
+              child: ListView.separated(
+                // scrollDirection: Axis.vertical,
+                separatorBuilder: (BuildContext context, int index) =>
+                    Kheight15,
+                shrinkWrap: true,
+                itemCount: favList.length,
+                itemBuilder: (context, index) {
+                  var item = favList[index];
+                  return cart_box(
+                    image: item['image'],
+                    name: item['name'],
+                    ontap: () {
+                      setState(() {
+                        favList.removeAt(index);
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class checkout_sec extends StatelessWidget {
-  const checkout_sec({
-    super.key,
-  });
+// class checkout_sec extends StatelessWidget {
+//   const checkout_sec({
+//     super.key,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<Favoritemodel>(context, listen: false);
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      width: double.infinity,
-      height: 120,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.black, width: 1))),
-      child: Column(
-        children: [
-          Kheight10,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Total"),
-              Consumer<Favoritemodel>(builder: (context, provider, child) {
-                return Text(
-                  "${provider.total}",
-                  style: CatStyle,
-                );
-              })
-            ],
-          ),
-          Kheight5,
-          MaterialButton(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            color: Colors.amber,
-            height: 50,
-            minWidth: 300,
-            onPressed: () {},
-            child: Text("Checkout"),
-          )
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     // final provider = Provider.of<Favoritemodel>(context, listen: false);
+//     return Container(
+//       padding: EdgeInsets.symmetric(horizontal: 20),
+//       width: double.infinity,
+//       height: 120,
+//       decoration: BoxDecoration(
+//           color: Colors.white,
+//           border: Border(top: BorderSide(color: Colors.black, width: 1))),
+//       child: Column(
+//         children: [
+//           Kheight10,
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Text("Total"),
+//               Consumer<Favoritemodel>(builder: (context, provider, child) {
+//                 return Text(
+//                   "${provider.total}",
+//                   style: CatStyle,
+//                 );
+//               })
+//             ],
+//           ),
+//           Kheight5,
+//           MaterialButton(
+//             shape:
+//                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+//             color: Colors.amber,
+//             height: 50,
+//             minWidth: 300,
+//             onPressed: () {},
+//             child: Text("Checkout"),
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class cart_box extends StatelessWidget {
-  const cart_box({
-    super.key,
-  });
+  final String name;
+  final String image;
+  final double price;
+  final VoidCallback ontap;
+  const cart_box(
+      {super.key,
+      required this.image,
+      required this.name,
+      this.price = 00,
+      required this.ontap});
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +145,10 @@ class cart_box extends StatelessWidget {
                     height: 80,
                     width: 80,
                     color: Colors.green,
+                    child: Image.network(
+                      image,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -135,8 +156,12 @@ class cart_box extends StatelessWidget {
                   width: 120,
                   child: Column(
                     children: [
-                      Text("Onam Gift box"),
-                      Text("Onam Gift box"),
+                      Text(
+                        name,
+                        style: TextStyle(),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       Text(
                         ("${provider.prize.toInt()}"),
                         style: TextStyle(
@@ -176,9 +201,9 @@ class cart_box extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               TextButton(
-                onPressed: () {},
+                onPressed: ontap,
                 child: Row(
-                  children: [Icon(Icons.badge), Kwidth10, Text("Remove")],
+                  children: [Icon(Icons.badge), Kwidth10, Text("Add to cart")],
                 ),
               ),
               Container(
@@ -187,9 +212,9 @@ class cart_box extends StatelessWidget {
                 color: Colors.black,
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: ontap,
                 child: Row(
-                  children: [Icon(Icons.delete), Kwidth10, Text("Add")],
+                  children: [Icon(Icons.delete), Kwidth10, Text("Remove")],
                 ),
               ),
             ],
